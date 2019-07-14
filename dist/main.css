@@ -1,0 +1,21 @@
+.pattern-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.pattern-circle {
+  position: relative;
+  cursor: pointer;
+}
+
+.pattern-dots {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+.pattern-lines{
+  background:rgba(255,255,255,.7);
+  position:absolute;
+}
+
