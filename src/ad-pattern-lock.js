@@ -31,11 +31,11 @@ class AdPatternLock extends Component {
     _onMove = (e) => {
         e.preventDefault();
         const {offsetTop, offsetLeft, lastVisitedPointID} = this.state;
-        const {matrix, patternCircle: {radius}, patternCircle: {margin}, patternDots} = this.props;
+        const {matrix, patternCircleRadius, patternCircleMargin, patternDotsRadius} = this.props;
 
         let xi = e.clientX || e.touches[0].clientX;
         let yi = e.clientY || e.touches[0].clientY;
-        const point = getPointID(xi - offsetLeft, yi - offsetTop, radius, margin, matrix, patternDots.radius);
+        const point = getPointID(xi - offsetLeft, yi - offsetTop, patternCircleRadius, patternCircleMargin, matrix, patternDotsRadius);
         let x, y;
         if (!Number.isNaN(parseInt(point.id)) && point.id !== lastVisitedPointID) {
             x = point.x + this.state.offsetLeft;
@@ -49,9 +49,9 @@ class AdPatternLock extends Component {
     };
 
     _onEnd = (e) => {
-        const {onCompletePattern, delimeter} = this.props;
-        if (onCompletePattern) {
-            const {path} = this.state;
+        const {onCompletePattern, delimeter, minimumPatternLength} = this.props;
+        const {path} = this.state;
+        if (onCompletePattern && path.length >= minimumPatternLength) {
             onCompletePattern(getPattern(path, delimeter));
         }
 
@@ -102,7 +102,7 @@ class AdPatternLock extends Component {
     };
 
     insertLine = (p1, p2, key, lines) => {
-        const {patternLines, patternDots} = this.props;
+        const {patternLinesHeight, patternLinesBackgroundColor, patternDotsRadius} = this.props;
         const lineLengthAngle = getLengthAngle(p1.x, p2.x, p1.y, p2.y);
         lines.push(
             <div key={key} className="pattern-lines"
@@ -110,12 +110,12 @@ class AdPatternLock extends Component {
                      {
                          left: p1.x,
                          top: p1.y,
-                         width: lineLengthAngle.length + patternDots.radius * 2,
+                         width: lineLengthAngle.length + patternDotsRadius * 2,
                          transform: `rotate(${lineLengthAngle.angle}deg)`,
-                         height: patternLines.height,
-                         borderRadius: patternLines.height / 2,
-                         transformOrigin: `${patternLines.height / 2}px ${patternLines.height / 2}px`,
-                         backgroundColor: patternLines.backgroundColor
+                         height: patternLinesHeight,
+                         borderRadius: patternLinesHeight / 2,
+                         transformOrigin: `${patternLinesHeight / 2}px ${patternLinesHeight / 2}px`,
+                         backgroundColor: patternLinesBackgroundColor
                      }
                  }
             />
@@ -135,7 +135,14 @@ class AdPatternLock extends Component {
     };
 
     render() {
-        const {matrix, patternCircle: {radius}, patternCircle: {margin}, backgroundColor, patternDots} = this.props;
+        const {
+            matrix,
+            patternCircleRadius,
+            patternCircleMargin,
+            backgroundColor,
+            patternDotsRadius,
+            patternDotsBackgroundColor
+        } = this.props;
         const {path} = this.state;
         return (
             <div className="pattern-holder"
@@ -144,25 +151,25 @@ class AdPatternLock extends Component {
                  onMouseDown={this._onStart}
                  style={
                      {
-                         width: (radius + margin) * 2 * matrix[1],
-                         height: (radius + margin) * 2 * matrix[0],
+                         width: (patternCircleRadius + patternCircleMargin) * 2 * matrix[1],
+                         height: (patternCircleRadius + patternCircleMargin) * 2 * matrix[0],
                          backgroundColor: backgroundColor
                      }
                  }>
                 <div className="pattern-wrapper">
                     {Array.from(Array(matrix[0] * matrix[1])).map((item, index) => {
-                        const {patternCircle} = this.props;
+                        const {patternCircleVisible, patternCircleVisibleBorder, patternCircleHoverBorder, patternCircleHoverVisible} = this.props;
                         const patternCircleStyle = {
-                            width: radius * 2,
-                            height: radius * 2,
-                            margin: margin,
-                            borderRadius: radius
+                            width: patternCircleRadius * 2,
+                            height: patternCircleRadius * 2,
+                            margin: patternCircleMargin,
+                            borderRadius: patternCircleRadius
                         };
-                        if (patternCircle.visible) {
-                            patternCircleStyle.border = patternCircle.visibleBorder;
+                        if (patternCircleVisible) {
+                            patternCircleStyle.border = patternCircleVisibleBorder;
                         }
-                        if (patternCircle.hoverVisible && !(path.filter(point => parseInt(point.id) === index).length === 0)) {
-                            patternCircleStyle.border = patternCircle.hoverBorder;
+                        if (patternCircleHoverVisible && !(path.filter(point => parseInt(point.id) === index).length === 0)) {
+                            patternCircleStyle.border = patternCircleHoverBorder;
                         }
                         return (
                             <div className="pattern-circle"
@@ -172,12 +179,12 @@ class AdPatternLock extends Component {
                                 <div className="pattern-dots"
                                      style={
                                          {
-                                             width: patternDots.radius * 2,
-                                             height: patternDots.radius * 2,
-                                             borderRadius: patternDots.radius,
-                                             marginTop: `-${patternDots.radius}px`,
-                                             marginLeft: `-${patternDots.radius}px`,
-                                             backgroundColor: patternDots.backgroundColor
+                                             width: patternDotsRadius * 2,
+                                             height: patternDotsRadius * 2,
+                                             borderRadius: patternDotsRadius,
+                                             marginTop: `-${patternDotsRadius}px`,
+                                             marginLeft: `-${patternDotsRadius}px`,
+                                             backgroundColor: patternDotsBackgroundColor
                                          }
                                      }
                                 />
@@ -196,22 +203,17 @@ AdPatternLock.defaultProps = {
     backgroundColor: "#556b2f",
     allowRepeat: false,
     delimeter: "",
-    patternDots: {
-        backgroundColor: "#fff",
-        radius: 5
-    },
-    patternCircle: {
-        radius: 25,
-        margin: 20,
-        visible: false,
-        visibleBorder: "3px solid #fff",
-        hoverVisible: false,
-        hoverBorder: "3px solid #afeeee"
-    },
-    patternLines: {
-        height: 10,
-        backgroundColor: 'rgba(255,255,255,.7)'
-    }
+    patternDotsBackgroundColor: "#fff",
+    patternDotsRadius: 5,
+    patternCircleRadius: 25,
+    patternCircleMargin: 20,
+    patternCircleVisible: false,
+    patternCircleVisibleBorder: "3px solid #fff",
+    patternCircleHoverVisible: false,
+    patternCircleHoverBorder: "3px solid #afeeee",
+    patternLinesHeight: 10,
+    patternLinesBackgroundColor: 'rgba(255,255,255,.7)',
+    minimumPatternLength: 2
 };
 
 export default AdPatternLock;

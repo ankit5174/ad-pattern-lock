@@ -1,7 +1,7 @@
 {
   "name": "ad-pattern-lock",
-  "version": "1.0.0",
-  "description": "A react plugin to simulate android like pattern lock for your web app",
+  "version": "1.0.1",
+  "description": "An react library for android like pattern lock for your web app. It's highly customizable according to your need",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -14,7 +14,8 @@
     "react pattern lock"
   ],
   "author": "Ankit Gupta",
-  "license": "ISC",
+  "license": "MIT",
+  "repository": "https://github.com/ankit5174/ad-pattern-lock",
   "publishConfig": {
     "access": "public"
   },

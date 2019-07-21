@@ -3,6 +3,10 @@
   flex-wrap: wrap;
 }
 
+.pattern-wrapper > * {
+  box-sizing: border-box;
+}
+
 .pattern-circle {
   position: relative;
   cursor: pointer;
