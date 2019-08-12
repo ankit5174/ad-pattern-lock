@@ -14,7 +14,7 @@ import AdPatternLock from "ad-pattern-lock";
 import 'ad-pattern-lock/dist/main.css';
 
 // in you render method
-<AdPatternLock/>
+<AdPatternLock onCompletePattern={(pattern) => {console.log(pattern)}/>
 ``` 
 
 ## Props API
@@ -36,6 +36,7 @@ import 'ad-pattern-lock/dist/main.css';
 | patternLinesHeight | 10 | height of the pattern lines[usually double of radius of pattern dots] |
 | patternLinesBackgroundColor | rgba(255,255,255,.7) | color of pattern lines |
 | minimumPatternLength| 2 | minimum pattern length
+| onCompletePattern | null | callback to receive the pattern seperated by the delimeter|
  
 
 ## License
